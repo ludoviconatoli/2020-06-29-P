@@ -104,7 +104,34 @@ public class FXMLController {
 
     @FXML
     void doCollegamento(ActionEvent event) {
+    	this.txtResult.clear();
+    	if(this.cmbM1.getItems().isEmpty() || this.cmbM2.getItems().isEmpty()) {
+    		this.txtResult.setText("Prima crea il grafo");
+    		return;
+    	}
     	
+    	Match partenza = this.cmbM1.getValue();
+    	Match arrivo = this.cmbM2.getValue();
+    	
+    	if(partenza == null || arrivo == null) {
+    		this.txtResult.setText("Prima selezionare il match di partenza e il match di arrivo");
+    		return;
+    	}
+    	
+    	List<Match> pm = new ArrayList<>(this.model.calcolaPercorsoMigliore(partenza, arrivo));
+    	this.txtResult.appendText("PERCORSO MIGLIORE TRA: \n");
+    	this.txtResult.appendText("  " + partenza + " - " + arrivo +"\n\n");
+    	
+    	if(this.model.getPesoMassimo() == 0) {
+    		this.txtResult.appendText("Non c'è un percorso, prova con altre partite");
+    		return;
+    	}
+    	
+    	for(Match m: pm) {
+    		this.txtResult.appendText(m + "\n");
+    	}
+    	
+    	this.txtResult.appendText("\nIl cui peso totale: " + this.model.getPesoMassimo());
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete

@@ -81,4 +81,63 @@ public class Model {
 		
 		return null;
 	}
+	
+	private List<Match> percorsoMigliore;
+	private double pesoMassimo = 0.0;
+	private List<Match> partite; 
+	private double pesoTemporaneo;
+	
+	public List<Match> calcolaPercorsoMigliore(Match partenza, Match arrivo) {
+		partite = new ArrayList<>();
+		percorsoMigliore = new ArrayList<>();
+		pesoTemporaneo = 0.0;
+		
+		partite.add(partenza);
+		cerca(partite, pesoTemporaneo, arrivo);
+		
+		return percorsoMigliore;
+	}
+	
+	public void cerca(List<Match> partite, double peso, Match arrivo) {
+		
+		if(partite.get(partite.size()-1).equals(arrivo)) {
+			if(peso > pesoMassimo) {
+				percorsoMigliore = new ArrayList<>(partite);
+				pesoMassimo = peso;
+			}
+			
+			return;
+		}
+		
+		for(Match m: Graphs.neighborListOf(this.grafo, partite.get(partite.size()-1))) {
+			
+			DefaultWeightedEdge de = grafo.getEdge(partite.get(partite.size()-1), m);
+			if(!partite.contains(m) && de != null && diverso(m, partite.get(partite.size()-1))) {
+				
+				partite.add(m);
+				peso += this.grafo.getEdgeWeight(de);
+				
+				cerca(partite, peso, arrivo);
+				
+				partite.remove(partite.get(partite.size()-1));
+				peso -= this.grafo.getEdgeWeight(de);
+			}
+		}
+	}
+	
+	public boolean diverso(Match m1, Match m2) {
+		if(!m1.getTeamHomeID().equals(m2.teamHomeID) &&
+				!m1.teamAwayID.equals(m2.teamHomeID) &&
+				!m1.getTeamHomeID().equals(m2.teamAwayID) &&
+				!m1.teamAwayID.equals(m2.teamAwayID)) {
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public double getPesoMassimo() {
+		return this.pesoMassimo;
+	}
 }
